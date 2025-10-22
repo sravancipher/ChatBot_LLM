@@ -1,0 +1,33 @@
+/* File Upload Styling */
+.file-upload {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px;
+}
+
+.file-upload-label {
+  padding: 10px 20px;
+  background-color: #2a7bf8;
+  color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.file-upload-label:hover {
+  background-color: #1e63cf;
+}
+
+.file-input {
+  display: none;
+}
+
+/* Input Area Styling */
+.input-area {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  background-color: #40414f;
+  border-top: 1px solid #555760;
+}

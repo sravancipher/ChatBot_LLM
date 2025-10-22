@@ -1,0 +1,223 @@
+App.tsx
+import React, { useState } from "react";
+import ChatWindow from "./components/ChatWindow";
+import ChatInput from "./components/ChatInput";
+import "./styles/ChatApp.css";
+
+export interface Message {
+  sender: "user" | "bot";
+  content: string;
+}
+
+const App: React.FC = () => {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  const handleSendMessage = async (message: string) => {
+    // Add user message to chat
+    setMessages((prev) => {
+      const updatedMessages = [...prev, { sender: "user", content: message }];
+      console.log("Updated messages with user message:", updatedMessages);
+      return updatedMessages;
+    });
+
+    // Call the backend API to get the bot's response
+    try {
+      const response = await fetch("http://localhost:8000/readque/", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: message }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error fetching response from server");
+      }
+
+      const data = await response.json();
+      console.log("botmsg:", data);
+      const botMessage = data;
+
+      // Add bot message to chat
+      setMessages((prev) => {
+        const updatedMessages = [...prev, { sender: "bot", content: botMessage }];
+        console.log("Updated messages with bot response:", updatedMessages);
+        return updatedMessages;
+      });
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+
+  console.log("messages:", messages);
+
+  return (
+    <div className="chat-app">
+      <ChatWindow messages={messages} />
+      <ChatInput onSend={handleSendMessage} />
+    </div>
+  );
+};
+
+export default App;
+
+ChatWindow.tsx:
+import React from "react";
+import { Message } from "../App";
+
+interface ChatWindowProps {
+  messages: Message[];
+}
+
+const ChatWindow: React.FC<ChatWindowProps> = ({ messages }) => {
+  return (
+    
+    <div className="chat-window">
+      {messages.map((msg, index) => (
+        <div key={index} className={`chat-message ${msg.sender}`}>
+          {msg.content}
+          
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default ChatWindow;
+
+ChatInput.tsx:
+import React, { useState } from "react";
+
+interface ChatInputProps {
+  onSend: (message: string) => void;
+}
+
+const ChatInput: React.FC<ChatInputProps> = ({ onSend }) => {
+  const [input, setInput] = useState("");
+
+  const handleSend = () => {
+    if (input.trim()) {
+      onSend(input);
+      setInput("");
+    }
+  };
+
+  return (
+    <div className="chat-input">
+      <input
+        type="text"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="Type a message..."
+      />
+      <button onClick={handleSend}>Send</button>
+    </div>
+  );
+};
+
+export default ChatInput;
+
+ChatApp.css
+/* General styling for the chat app */
+.chat-app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh; /* Full screen height */
+    width: 100vw; /* Full screen width */
+    margin: 0;
+    border: none;
+    border-radius: 0;
+    overflow: hidden;
+    background-color: #121212; /* Dark background for the app */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5); /* Light shadow for depth */
+  }
+  
+  /* Chat window styling */
+  .chat-window {
+    flex: 1; /* Takes up all available vertical space */
+    padding: 20px;
+    background-color: #1e1e1e; /* Darker grey for the chat window */
+    overflow-y: auto;
+    border-bottom: 1px solid #333; /* Subtle line for separation */
+    border-radius: 0; /* Remove any border radius for full screen */
+    max-height: calc(100vh - 80px); /* Ensure it does not overlap input */
+  }
+  
+  /* Individual chat messages */
+  .chat-message {
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    border-radius: 20px;
+    max-width: 75%;
+    word-wrap: break-word;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+  
+  /* User message styling */
+  .chat-message.user {
+    background-color: #007bff; /* Blue for user messages */
+    color: white;
+    align-self: flex-end;
+  }
+  
+  /* Bot message styling */
+  .chat-message.bot {
+    background-color: #333333; /* Dark grey for bot messages */
+    color: white;
+    align-self: flex-start;
+  }
+  
+  /* Input section styling */
+  .chat-input {
+    display: flex;
+    padding: 12px;
+    background-color: #1e1e1e; /* Dark input area */
+    border-top: 1px solid #333;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+  }
+  
+  /* Input box */
+  .chat-input input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #444;
+    border-radius: 30px;
+    margin-right: 12px;
+    background-color: #2a2a2a; /* Darker input field */
+    color: white;
+    font-size: 16px;
+  }
+  
+  /* Send button styling */
+  .chat-input button {
+    padding: 12px 20px;
+    border: none;
+    background-color: #4e73df; /* Blue button */
+    color: white;
+    border-radius: 30px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+  }
+  
+  .chat-input button:hover {
+    background-color: #3a5bdc; /* Lighter blue on hover */
+  }
+  
+  /* Scrollbar styling */
+  .chat-window::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .chat-window::-webkit-scrollbar-thumb {
+    background-color: #4e73df; /* Blue for scrollbar thumb */
+    border-radius: 10px;
+  }
+  
+  .chat-window::-webkit-scrollbar-track {
+    background: #1e1e1e; /* Dark background for the scrollbar track */
+  }
+  
