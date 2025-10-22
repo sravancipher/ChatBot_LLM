@@ -1,7 +1,3 @@
-Here is a **clean and clear README.md** for your ParaBot application based on your FastAPI backend + TypeScript frontend architecture.
-
----
-
 ## 📌 ParaBot — AI Powered File Understanding & Query Assistant
 
 ParaBot is an AI-driven web application built using **FastAPI (Backend)** and **TypeScript + React (Frontend)** that allows users to upload different types of files (PDF, Excel, Image, TXT, CSV) and extract insights, summaries, context-aware answers, or perform OCR-based text recognition. It can also scrape web pages, generate code from descriptions, and handle text + image inputs simultaneously.
